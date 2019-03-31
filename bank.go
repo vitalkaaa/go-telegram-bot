@@ -8,7 +8,6 @@ import (
 	"log"
 )
 
-var userCalculationInfo = map[int64]*models.CalculationInfo{}
 
 func main() {
 	bot, err := tgbotapi.NewBotAPI("483762821:AAGiiGnVarnB76oT0h3EutYkv_ROEwkRAKU")
@@ -25,47 +24,37 @@ func main() {
 	}
 
 	for update := range updates {
-
 		// If a message is received
 		if update.Message != nil {
-			chatID 	:= update.Message.Chat.ID
-			text 	:= update.Message.Text
-			msgID	:= update.Message.MessageID
-
-			if userCalculationInfo[chatID] == nil {
-				userCalculationInfo[chatID] = &models.CalculationInfo{}
-				userCalculationInfo[chatID].Days = 999
-			}
-
-			ctx := context.GetMessageContext(bot, userCalculationInfo[chatID], chatID, msgID, text)
+			calculationInfo := models.GetCalculationInfo(update.Message.Chat.ID)
+			ctx := context.GetContext(bot, calculationInfo, update)
 
 			switch update.Message.Command() {
 			case "start":
-				handlers.StartMessageHandler(&ctx)
+				handlers.StartMessageHandler(ctx)
 			default:
-				switch userCalculationInfo[chatID].State {
+				switch calculationInfo.State {
 					case "money":
-						handlers.MoneyMessageHandler(&ctx)
+						handlers.MoneyMessageHandler(ctx)
 					case "term" :
-						handlers.TermMessageHandler(&ctx)
+						handlers.TermMessageHandler(ctx)
 				}
 			}
-			log.Println(ctx, userCalculationInfo[chatID])
+			log.Println(ctx, calculationInfo)
 		}
 
 		// If a button callback is received
 		if update.CallbackQuery != nil {
-			chatID := update.CallbackQuery.Message.Chat.ID
-			msgID := update.CallbackQuery.Message.MessageID
-			ctx := context.GetCallbackContext(bot, userCalculationInfo[chatID], chatID, msgID, update)
+			calculationInfo := models.GetCalculationInfo(update.CallbackQuery.Message.Chat.ID)
+			ctx := context.GetContext(bot, calculationInfo, update)
 
 			switch update.CallbackQuery.Data {
 				case "start":
-					handlers.StartCallbackHandler(&ctx)
+					handlers.StartCallbackHandler(ctx)
 				case "44-ФЗ", "223-ФЗ", "185-ФЗ":
-					handlers.FZChooseHandler(&ctx)
+					handlers.FZChooseHandler(ctx)
 			}
-			log.Println(ctx, userCalculationInfo[chatID])
+			log.Println(ctx, calculationInfo)
 		}
 	}
 }

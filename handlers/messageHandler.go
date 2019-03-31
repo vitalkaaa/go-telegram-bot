@@ -8,9 +8,9 @@ import (
 	"strconv"
 )
 
-func StartMessageHandler(ctx *context.MessageContext) {
+func StartMessageHandler(ctx *context.Context) {
 	btnData := "start"
-	msg := tgbotapi.NewMessage(ctx.ChatID, "📌 Абсолют Банк дает гарантию на участие в закупках!\n" +
+	msg := tgbotapi.NewMessage(ctx.Update.Message.Chat.ID, "📌 Абсолют Банк дает гарантию на участие в закупках!\n" +
 		"✅ Средний срок выдачи 1 рабочий день\n" +
 		"✅ Не требуется открытие расчетного счета\n" +
 		"✅ Направление оригинала гарантии курьерской службой в любой регион России\n" +
@@ -27,10 +27,10 @@ func StartMessageHandler(ctx *context.MessageContext) {
 	}
 }
 
-func MoneyMessageHandler(ctx *context.MessageContext) {
+func MoneyMessageHandler(ctx *context.Context) {
 	msg := tgbotapi.MessageConfig{}
 	var text string
-	m, err := strconv.Atoi(ctx.Text)
+	m, err := strconv.Atoi(ctx.Update.Message.Text)
 	if err != nil {
 		text = "Сумма должна быть числом. Повторите попытку"
 	} else {
@@ -43,9 +43,9 @@ func MoneyMessageHandler(ctx *context.MessageContext) {
 		}
 	}
 
-	msg.ChatID = ctx.ChatID
+	msg.ChatID = ctx.Update.Message.Chat.ID
 	msg.Text = text
-	msg.ReplyToMessageID = ctx.MsgID
+	msg.ReplyToMessageID = ctx.Update.Message.MessageID
 
 	_, err = ctx.Bot.Send(msg)
 	if err != nil {
@@ -53,10 +53,10 @@ func MoneyMessageHandler(ctx *context.MessageContext) {
 	}
 }
 
-func TermMessageHandler(ctx *context.MessageContext) {
+func TermMessageHandler(ctx *context.Context) {
 	var text string
 	msg := tgbotapi.MessageConfig{}
-	d, err := strconv.Atoi(ctx.Text)
+	d, err := strconv.Atoi(ctx.Update.Message.Text)
 	if err != nil {
 		text = "Количество дней должно быть числом. Повторите попытку"
 	} else {
@@ -72,8 +72,8 @@ func TermMessageHandler(ctx *context.MessageContext) {
 	}
 
 	msg.Text = text
-	msg.ChatID = ctx.ChatID
-	msg.ReplyToMessageID = ctx.MsgID
+	msg.ChatID = ctx.Update.Message.Chat.ID
+	msg.ReplyToMessageID = ctx.Update.Message.MessageID
 
 	_, err = ctx.Bot.Send(msg)
 	if err != nil {
