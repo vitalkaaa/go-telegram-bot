@@ -1,6 +1,6 @@
 package context
 
-import "bankBot/models"
+import "go-telegram-bot/models"
 import "gopkg.in/telegram-bot-api.v4"
 
 type Context struct {

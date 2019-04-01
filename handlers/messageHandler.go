@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"bankBot/context"
-	"bankBot/models"
+	"go-telegram-bot/context"
+	"go-telegram-bot/models"
 	"gopkg.in/telegram-bot-api.v4"
 	"log"
 	"strconv"
